@@ -1,0 +1,38 @@
+#T-test comparing kto genotype and SNP genotype including controls#
+
+#FEMALE T-TEST#
+proc univariate data=work.nmo_F normal;
+    class ktogenotype;
+    var 'Motility(s)'n;
+run;
+
+ods output TTests=work.ttest_NmoF;
+
+proc ttest data=work.nmo_F sides=2 plots(showh0);
+    class ktogenotype;
+    var 'Motility(s)'n;
+run;
+
+data work.ttest_NmoF_scientific;
+    set work.ttest_NmoF;
+    Probt_scientific = put(Probt, BEST32.-L);
+Run;
+
+
+#MALE T-TEST#
+proc univariate data=work.nmo_M normal;
+    class ktogenotype;
+    var 'Motility(s)'n;
+run;
+
+ods output TTests=work.ttest_NmoM;
+
+proc ttest data=work.nmo_M sides=2 plots(showh0);
+    class ktogenotype;
+    var 'Motility(s)'n;
+run;
+
+data work.ttest_NmoM_scientific;
+    set work.ttest_NmoM;
+    Probt_scientific = put(Probt, BEST32.-L);
+Run;

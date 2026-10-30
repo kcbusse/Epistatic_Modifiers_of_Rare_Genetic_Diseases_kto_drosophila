@@ -1,0 +1,47 @@
+*/Pairwise analysis for startle modifier candidate validation.*/
+
+*/FULL FACTORIAL*/
+ods noproctitle;
+ods graphics / imagemap=on;
+ods output Type3=work.type3_table_full; /* Type III table */                                    
+ods output CovParms=work.covparam_full_table; /* Covariance Parameter Estimates table */  
+
+proc mixed data=WORK.FOXO_STARTLE method=type3 
+        plots(maxpoints=none)=(residualPanel) alpha=0.05;
+    class ktogenotype Line Sex SNPgenotype;
+    model 'Motility(s)'n=ktogenotype Sex SNPgenotype ktogenotype*SNPgenotype 
+        ktogenotype*Sex Sex*SNPgenotype ktogenotype*Sex*SNPgenotype /;
+    random Line(SNPgenotype) ktogenotype*Line(SNPgenotype) Line*Sex(SNPgenotype) 
+        ktogenotype*Line*Sex(SNPgenotype) /;
+run;
+
+data work.type3_table_full_scientific;                                    
+  set work.type3_table_full;                                    
+  ProbF_scientific = put(ProbF, BEST32. -L);                                    
+Run;
+
+*/REDUCED BY SEX*/
+ods noproctitle;
+ods graphics / imagemap=on;
+ods output Type3=work.type3_table_redbysex; /* Type III table */                                    
+ods output CovParms=work.covparam_redbysex_table; /* Covariance Parameter Estimates table */
+
+proc sort data=WORK.FOXO_STARTLE out=Work.TempDataSorted;
+    by Sex;
+run;
+
+proc mixed data=Work.TempDataSorted method=type3 
+        plots(maxpoints=none)=(residualPanel) alpha=0.05;
+    class ktogenotype Line SNPgenotype;
+    model 'Motility(s)'n=ktogenotype SNPgenotype ktogenotype*SNPgenotype /;
+    random Line(SNPgenotype) ktogenotype*Line(SNPgenotype) /;
+    by Sex;
+run;
+
+proc delete data=Work.TempDataSorted;
+run;
+
+data work.type3_table_redbysex_scientific;                                    
+  set work.type3_table_redbysex;                                    
+  ProbF_scientific = put(ProbF, BEST32. -L);                                    
+run;

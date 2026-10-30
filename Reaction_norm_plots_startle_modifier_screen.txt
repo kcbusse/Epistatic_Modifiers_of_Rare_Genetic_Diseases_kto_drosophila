@@ -1,0 +1,45 @@
+# Load libraries
+library(ggplot2)
+library(dplyr)
+
+#Read in data
+data <- read.csv("startlerxnnorminput.csv")
+
+# Check data
+head(data)
+tail(data)
+
+# Ensure Genotype is a factor for plotting
+data$Genotype <- factor(data$Genotype, levels = c("W", "ktoKO"))  # Adjust levels if needed
+
+# Separate female and male data
+femaledata <- data %>% filter(Sex == "F") %>% select(Sex, Line, Genotype, Mean, SD)
+maledata   <- data %>% filter(Sex == "M") %>% select(Sex, Line, Genotype, Mean, SD)
+
+# Female reaction norm plot
+p_female <- ggplot(femaledata, aes(x = Genotype, y = Mean, group = Line, color = Line)) +
+  geom_line(size = 0.25) +    # line thickness
+  geom_point(size = 1.5) +    # point size
+  labs(title = "Female Reaction Norm", x = "Genotype", y = "Mean Startle Response") +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+
+# Male reaction norm plot
+p_male <- ggplot(maledata, aes(x = Genotype, y = Mean, group = Line, color = Line)) +
+  geom_line(size = 0.25) +
+  geom_point(size = 1.5) +
+  labs(title = "Male Reaction Norm", x = "Genotype", y = "Mean Startle Response") +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+
+# Print plots
+print(p_female)
+print(p_male)
+
+# Optional: save plots
+ggsave("Female_ReactionNorm.tiff", plot = p_female, width = 6.5, height = 8, units = "in", dpi = 600)
+ggsave("Male_ReactionNorm.tiff", plot = p_male, width = 6.5, height = 8, units = "in", dpi = 600)
